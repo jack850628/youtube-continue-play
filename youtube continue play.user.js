@@ -10,7 +10,7 @@
 // @description:zh-CN  当出现"影片已暂停，要继续观赏吗？"对话方块时自动按下"是"
 // @description:ja    「ビデオを一時停止しました。引き続き視聴しますか？」ダイアログボックスが表示されたら、「はい」を自動的に押します
 // @namespace          https://greasyfork.org/zh-TW/users/461233-jack850628
-// @version            1.11
+// @version            1.12
 // @author             jack850628
 // @include            /^https?:\/\/(:?.*?\.?)youtube.com/.*$/
 // @run-at             document-end
@@ -19,23 +19,30 @@
 
 (function() {
     const debug = true;
+    var isObserveYtConfirmDialogRenderer = false;
+    let ytConfirmDialogRendererObserver = new MutationObserver(([{target: ytConfirmDialogRenderer}], observer) => {
+        if(ytConfirmDialogRenderer.style.display != 'none'){
+            if(debug) console.log('被暫停了，但是我要繼續播放');
+            ytConfirmDialogRenderer.querySelector('yt-button-renderer[dialog-confirm]').click();
+            if(debug) console.log('按下"是"');
+        }
+    });
     let pausedF = function({target: videoPlay}){
         if(debug) console.log('暫停播放');
-        setTimeout(function(){
-            let ytConfirmDialog = document.querySelector('yt-confirm-dialog-renderer');
-            if(
-                ytConfirmDialog &&
-                ytConfirmDialog.parentElement &&
-                ytConfirmDialog.parentElement.style.display != 'none'
-            ){
-                //videoPlay.play();
-                if(debug) console.log('被暫停了，但是我要繼續播放');
-                ytConfirmDialog.querySelector('yt-button-renderer[dialog-confirm]').click();
-                if(debug) console.log('按下"是"');
-            }else{
-                if(debug) console.log('對話方塊找不到或是隱藏了',ytConfirmDialog);
-            }
-        }, 500);//確保在暫停時對話方塊一定找得到
+        if(!isObserveYtConfirmDialogRenderer){
+            setTimeout(function(){
+                let ytConfirmDialog = document.querySelector('yt-confirm-dialog-renderer');
+                if(ytConfirmDialog){
+                    ytConfirmDialogRendererObserver.observe(
+                        ytConfirmDialog.parentElement,
+                        {
+                            attributes: true
+                        }
+                    );
+                    isObserveYtConfirmDialogRenderer = true;
+                }else if(debug) console.log('對話方塊找不到',ytConfirmDialog);
+            }, 500);//確保在暫停時對話方塊一定找得到
+        }else if(debug) console.log('對話方塊已經被觀察了');
     }
     function listenerVideoPlayer(){
         let videoPlay = document.querySelector('video');
