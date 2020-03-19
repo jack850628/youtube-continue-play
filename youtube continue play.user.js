@@ -4,13 +4,13 @@
 // @name:zh-CN         youtube继续播放
 // @name:zh-TW         youtube繼續播放
 // @name:ja            youtube履歴書再生
-// @description        When the "Video paused, do you want to continue watching?" Dialog box appears, press "Yes" automatically
-// @description:en     When the "Video paused, do you want to continue watching?" Dialog box appears, press "Yes" automatically
-// @description:zh-TW  當出現"影片已暫停，要繼續觀賞嗎？"對話方塊時自動按下"是"
-// @description:zh-CN  当出现"影片已暂停，要继续观赏吗？"对话方块时自动按下"是"
-// @description:ja    「ビデオを一時停止しました。引き続き視聴しますか？」ダイアログボックスが表示されたら、「はい」を自動的に押します
+// @description        When "Video paused, do you want to continue watching?" Appears, ignore it and continue playing automatically
+// @description:en     When "Video paused, do you want to continue watching?" Appears, ignore it and continue playing automatically
+// @description:zh-TW  當出現"影片已暫停，要繼續觀賞嗎？"時忽略它繼續播放
+// @description:zh-CN  当出现"影片已暂停，要继续观赏吗？"时忽略它继续播放
+// @description:ja    「ビデオが一時停止しましたが、引き続き視聴しますか？」が表示されたら無視して再生を続けます
 // @namespace          https://greasyfork.org/zh-TW/users/461233-jack850628
-// @version            1.14
+// @version            1.15
 // @author             jack850628
 // @include            /^https?:\/\/(:?.*?\.?)youtube.com/.*$/
 // @noframes
@@ -19,9 +19,8 @@
 // ==/UserScript==
 
 (function() {
-        const debug = true;
         let pausedF = function({target: videoPlay}){
-        if(debug) console.log('暫停播放');
+        console.debug('暫停播放');
         setTimeout(function(){
             let ytConfirmDialog = document.querySelector('yt-confirm-dialog-renderer');
             if(
@@ -34,21 +33,21 @@
                     )//當網頁不可見時，DOM元件不會即時渲染，所以對話方塊的display還會是none
                 )
             ){
-                if(debug) console.log('被暫停了，但是我要繼續播放');
+                console.debug('被暫停了，但是我要繼續播放');
                 //ytConfirmDialog.querySelector('yt-button-renderer[dialog-confirm]').click();//當網頁不可見時，出發click是不會繼續播放的，因為要等到網頁可見時觸發UI渲染後才會把對話方塊關掉，對話方塊關掉後才會出發video的play事件
                 videoPlay.play();
-                if(debug) console.log('按下"是"');
-            }else if(debug) console.log('對話方塊找不到或是隱藏了',ytConfirmDialog);
+                console.debug('按下"是"');
+            }else console.debug('對話方塊找不到或是隱藏了',ytConfirmDialog);
         }, 500);//確保在暫停時對話方塊一定找得到
     }
     function listenerVideoPlayer(){
         let videoPlay = document.querySelector('video');
         if(!videoPlay){
-            if(debug) console.log('找不到播放器');
+            console.debug('找不到播放器');
             return false;
         }
         videoPlay.addEventListener('pause', pausedF);
-        if(debug) console.log('找到播放器，開始監聽');
+        console.debug('找到播放器，開始監聽');
         return true;
     }
     let scriptBlocks = document.getElementsByTagName('script')[0];
@@ -79,11 +78,11 @@
         document.querySelector('#ycp-script').setAttribute('ycp-data','ok');
 	`;
     let ycpScriptObserver = new MutationObserver(([{target: ycpScript}], observer) => {
-        if(debug) console.log('#ycp-script屬性更動', ycpScript, ycpScriptObserver);
-          if(ycpScript.getAttribute('ycp-data') == 'ok'){
-              if(!listenerVideoPlayer()) ycpScript.setAttribute('ycp-data','wait')
-              else ycpScriptObserver.disconnect();
-          }
+        console.debug('#ycp-script屬性更動', ycpScript, ycpScriptObserver);
+        if(ycpScript.getAttribute('ycp-data') == 'ok'){
+            if(!listenerVideoPlayer()) ycpScript.setAttribute('ycp-data','wait')
+            else ycpScriptObserver.disconnect();
+        }
     });
 	if(scriptBlocks){
         ycpScriptObserver.observe(
