@@ -37,7 +37,6 @@
                 if(debug) console.log('被暫停了，但是我要繼續播放');
                 //ytConfirmDialog.querySelector('yt-button-renderer[dialog-confirm]').click();//當網頁不可見時，出發click是不會繼續播放的，因為要等到網頁可見時觸發UI渲染後才會把對話方塊關掉，對話方塊關掉後才會出發video的play事件
                 videoPlay.play();
-                videoPlay.play();
                 if(debug) console.log('按下"是"');
             }else if(debug) console.log('對話方塊找不到或是隱藏了',ytConfirmDialog);
         }, 500);//確保在暫停時對話方塊一定找得到
