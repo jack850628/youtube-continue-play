@@ -34,7 +34,7 @@
                 )
             ){
                 console.debug('被暫停了，但是我要繼續播放');
-                //ytConfirmDialog.querySelector('yt-button-renderer[dialog-confirm]').click();//當網頁不可見時，觸發click是不會繼續播放的，因為要等到網頁可見時觸發UI渲染後才會把對話方塊關掉，對話方塊關掉後才會出發video的play事件
+                //ytConfirmDialog.querySelector('yt-button-renderer[dialog-confirm]').click();//當網頁不可見時，出發click是不會繼續播放的，因為要等到網頁可見時觸發UI渲染後才會把對話方塊關掉，對話方塊關掉後才會出發video的play事件
                 videoPlay.play();
                 console.debug('按下"是"');
             }else console.debug('對話方塊找不到或是隱藏了',ytConfirmDialog);
@@ -51,32 +51,32 @@
         return true;
     }
     let scriptBlocks = document.getElementsByTagName('script')[0];
-	let ycpScript = document.createElement('script');
+    let ycpScript = document.createElement('script');
     ycpScript.setAttribute('id','ycp-script');
     ycpScript.setAttribute('ycp-data','wait');
-	ycpScript.innerHTML = `
-		window.spf._request = window.spf.request;//youtube的ajax是使用spf，https://github.com/youtube/spfjs
-		Object.defineProperty(window.spf, 'request', {//改寫request函數
-			value: function(){
-				if(arguments[1]){
-					if(arguments[1].onDone){//當請求完成後嘗試監聽VideoPlayer
-						let onDone = arguments[1].onDone;
-						arguments[1].onDone = function(){
-							let result = onDone.apply(this,arguments);
-							document.querySelector('#ycp-script').setAttribute('ycp-data','ok');
-							return result;
-						}
-					}else{
-						arguments[1].onDone = () => document.querySelector('#ycp-script').setAttribute('ycp-data','ok');
-					}
-				}
-				return window.spf._request.apply(this,arguments);
-			},
-			writable: true,
-			configurable: true
-		});
+    ycpScript.innerHTML = `
+        window.spf._request = window.spf.request;//youtube的ajax是使用spf，https://github.com/youtube/spfjs
+        Object.defineProperty(window.spf, 'request', {//改寫request函數
+            value: function(){
+                if(arguments[1]){
+                    if(arguments[1].onDone){//當請求完成後嘗試監聽VideoPlayer
+                        let onDone = arguments[1].onDone;
+                        arguments[1].onDone = function(){
+                            let result = onDone.apply(this,arguments);
+                            document.querySelector('#ycp-script').setAttribute('ycp-data','ok');
+                            return result;
+                        }
+                    }else{
+                        arguments[1].onDone = () => document.querySelector('#ycp-script').setAttribute('ycp-data','ok');
+                    }
+                }
+                return window.spf._request.apply(this,arguments);
+            },
+            writable: true,
+            configurable: true
+        });
         document.querySelector('#ycp-script').setAttribute('ycp-data','ok');
-	`;
+    `;
     let ycpScriptObserver = new MutationObserver(([{target: ycpScript}], observer) => {
         console.debug('#ycp-script屬性更動', ycpScript, ycpScriptObserver);
         if(ycpScript.getAttribute('ycp-data') == 'ok'){
@@ -84,13 +84,13 @@
             else ycpScriptObserver.disconnect();
         }
     });
-	if(scriptBlocks){
+    if(scriptBlocks){
         ycpScriptObserver.observe(
             ycpScript,
             {
                 attributes: true
             }
         );
-		scriptBlocks.parentNode.insertBefore(ycpScript,scriptBlocks);
-	}
+        scriptBlocks.parentNode.insertBefore(ycpScript,scriptBlocks);
+    }
 })();
