@@ -19,7 +19,7 @@
 // ==/UserScript==
 
 (function() {
-        let pausedF = function({target: videoPlay}){
+    let pausedF = function({target: videoPlay}){
         console.debug('暫停播放');
         setTimeout(function(){
             let ytConfirmDialog = document.querySelector('yt-confirm-dialog-renderer');
