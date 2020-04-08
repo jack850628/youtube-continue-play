@@ -19,7 +19,7 @@
 // ==/UserScript==
 
 (function() {
-    let pausedF = function({target: videoPlay}){
+    let pausedFun = function({target: videoPlayer}){
         console.debug('暫停播放');
         setTimeout(function(){
             let ytConfirmDialog = document.querySelector('yt-confirm-dialog-renderer');
@@ -29,24 +29,24 @@
                     ytConfirmDialog.parentElement.style.display != 'none' ||
                     (
                         document.hidden &&
-                        videoPlay.getCurrentTime() < videoPlay.getDuration()//防止重複播放
+                        videoPlayer.getCurrentTime() < videoPlayer.getDuration()//防止重複播放
                     )//當網頁不可見時，DOM元件不會即時渲染，所以對話方塊的display還會是none
                 )
             ){
                 console.debug('被暫停了，但是我要繼續播放');
                 //ytConfirmDialog.querySelector('yt-button-renderer[dialog-confirm]').click();//當網頁不可見時，觸發click是不會繼續播放的，因為要等到網頁可見時觸發UI渲染後才會把對話方塊關掉，對話方塊關掉後才會出發video的play事件
-                videoPlay.play();
+                videoPlayer.play();
                 console.debug('按下"是"');
-            }else console.debug('對話方塊找不到或是隱藏了',ytConfirmDialog);
+            }else console.debug('對話方塊找不到或是隱藏了', ytConfirmDialog && ytConfirmDialog.parentElement, document.hidden, videoPlayer.getCurrentTime(), videoPlayer.getDuration());
         }, 500);//確保在暫停時對話方塊一定找得到
     }
     function listenerVideoPlayer(){
-        let videoPlay = document.querySelector('video');
-        if(!videoPlay){
+        let videoPlayer = document.querySelector('video');
+        if(!videoPlayer){
             console.debug('找不到播放器');
             return false;
         }
-        videoPlay.addEventListener('pause', pausedF);
+        videoPlayer.addEventListener('pause', pausedFun);
         console.debug('找到播放器，開始監聽');
         return true;
     }
