@@ -3,12 +3,12 @@
 // @name:en            youtube continue play
 // @name:zh-CN         youtube继续播放
 // @name:zh-TW         youtube繼續播放
-// @name:ja            youtube履歴書再生
+// @name:ja            youtube再生自動継続
 // @description        When "Video paused, do you want to continue watching?" Appears, ignore it and continue playing automatically
 // @description:en     When "Video paused, do you want to continue watching?" Appears, ignore it and continue playing automatically
 // @description:zh-TW  當出現"影片已暫停，要繼續觀賞嗎？"時忽略它繼續播放
 // @description:zh-CN  当出现"影片已暂停，要继续观赏吗？"时忽略它继续播放
-// @description:ja    「ビデオが一時停止しましたが、引き続き視聴しますか？」が表示されたら無視して再生を続けます
+// @description:ja    「動画が一時停止されました。続きを視聴しますか？」が表示されても無視して再生を続けます
 // @namespace          https://greasyfork.org/zh-TW/users/461233-jack850628
 // @version            1.17
 // @author             jack850628
