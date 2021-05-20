@@ -8,9 +8,9 @@
 // @description:zh-CN  当出现"影片已暂停，要继续观赏吗？"时忽略它继续播放
 // @description:ja    「動画が一時停止されました。続きを視聴しますか？」が表示されても無視して再生を続けます
 // @namespace          https://greasyfork.org/zh-TW/users/461233-jack850628
-// @version            1.20.0519
+// @version            1.20.0520
 // @author             jack850628
-// @include            /^https?:\/\/(:?.*?\.)*youtube.com\/.*$/
+// @include            https://*.youtube.com/*
 // @noframes
 // @run-at             document-end
 // @license            MIT
