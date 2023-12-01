@@ -8,14 +8,14 @@
 // @description:zh-CN  当出现"影片已暂停，要继续观赏吗？"时忽略它继续播放
 // @description:ja    「動画が一時停止されました。続きを視聴しますか？」が表示されても無視して再生を続けます
 // @namespace          https://greasyfork.org/zh-TW/users/461233-jack850628
-// @version            1.20.0520
+// @version            1.21.231201
 // @author             jack850628
 // @include            https://*.youtube.com/*
 // @noframes
 // @run-at             document-end
 // @license            MIT
 // ==/UserScript==
- 
+
 (function() {
     let pausedFun = function({target: videoPlayer}){
         console.debug('暫停播放');
@@ -38,28 +38,57 @@
             }else console.debug('對話方塊找不到或是隱藏了', ytConfirmDialog && ytConfirmDialog.parentElement, document.hidden, videoPlayer.currentTime, videoPlayer.duration);
         }, 500);//確保在暫停時對話方塊一定找得到
     }
-    let listenerVideoPlayer = function(doc){
-        let pathname = new URL(location.href).pathname;
-        let videoPlayer = doc.querySelector('video');
- 
-        console.debug(pathname, pathname.startsWith('/watch'))
-        if(!videoPlayer || !pathname.startsWith('/watch')){
-            console.debug('找不到播放器');
-            return false;
+    function observerPlayerRoot(doc){
+        let nowPlayer = doc.querySelector('video');
+        if(nowPlayer){
+            console.debug('找到播放器', player);
+            player.addEventListener('pause', pausedFun);
         }
-        videoPlayer.addEventListener('pause', pausedFun);
-        console.debug('找到播放器，開始監聽', videoPlayer);
-        return true;
+        let ycpObserver = new MutationObserver((mutationdeList, observer) => {
+            mutationdeList.flatMap(i => [...i.addedNodes]).flat().forEach(doc => {
+                if(doc.tagName){
+                    let player = null;
+                    if(doc.tagName == 'VIDEO'){
+                        player = doc;
+                    }else if(!["SCRIPT", "STYLE", "LINK", "MATE"].includes(doc.tagName)){
+                        player = doc.querySelector('video');
+                    }
+                    if(player && player != nowPlayer){
+                        nowPlayer = player;
+                        console.debug('找到播放器', nowPlayer);
+                        player.addEventListener('pause', pausedFun);
+                    }
+                }
+            });
+        });
+        ycpObserver.observe(
+            doc,
+            {
+                childList: true,
+                subtree: true
+            }
+        );
     }
-    let ycpObserver = new MutationObserver(([{target: doc}], observer) => {
-        console.debug('頁面更動', ycpObserver);
-        if(listenerVideoPlayer(doc)) ycpObserver.disconnect();
-    });
-    ycpObserver.observe(
-        document,
-        {
-            childList: true,
-            subtree: true
-        }
-    );
+    let playerRoot = document.querySelector('#player');
+    if(playerRoot){
+        observerPlayerRoot(playerRoot);
+    }else{
+        let rootObserver = new MutationObserver((mutationdeList, observer) => {
+            mutationdeList.flatMap(i => [...i.addedNodes]).flat().forEach(doc => {
+                if (doc.tagName && !["SCRIPT", "STYLE", "LINK", "MATE"].includes(doc.tagName)){
+                    let playerRoot = doc.querySelector('#player');
+                    if(playerRoot){
+                        observerPlayerRoot(playerRoot);
+                    }
+                }
+            });
+        });
+        rootObserver.observe(
+            document,
+            {
+                childList: true,
+                subtree: true
+            }
+        );
+    }
 })();
