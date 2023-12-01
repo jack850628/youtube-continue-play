@@ -79,6 +79,7 @@
                     let playerRoot = doc.querySelector('#player');
                     if(playerRoot){
                         observerPlayerRoot(playerRoot);
+                        rootObserver.disconnect();
                     }
                 }
             });
