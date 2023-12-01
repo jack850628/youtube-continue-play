@@ -8,7 +8,7 @@
 // @description:zh-CN  当出现"影片已暂停，要继续观赏吗？"时忽略它继续播放
 // @description:ja    「動画が一時停止されました。続きを視聴しますか？」が表示されても無視して再生を続けます
 // @namespace          https://greasyfork.org/zh-TW/users/461233-jack850628
-// @version            1.21.231201
+// @version            1.21.231202
 // @author             jack850628
 // @include            https://*.youtube.com/*
 // @noframes
@@ -41,8 +41,8 @@
     function observerPlayerRoot(doc){
         let nowPlayer = doc.querySelector('video');
         if(nowPlayer){
-            console.debug('找到播放器', player);
-            player.addEventListener('pause', pausedFun);
+            console.debug('找到播放器', nowPlayer);
+            nowPlayer.addEventListener('pause', pausedFun);
         }
         let ycpObserver = new MutationObserver((mutationdeList, observer) => {
             mutationdeList.flatMap(i => [...i.addedNodes]).flat().forEach(doc => {
@@ -56,7 +56,7 @@
                     if(player && player != nowPlayer){
                         nowPlayer = player;
                         console.debug('找到播放器', nowPlayer);
-                        player.addEventListener('pause', pausedFun);
+                        nowPlayer.addEventListener('pause', pausedFun);
                     }
                 }
             });
